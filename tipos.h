@@ -18,4 +18,6 @@ struct Config {
     int velMs = 1000;                    
 };
 
+const int SPLIT_MINIMO_KB = 32;
+
 #endif
