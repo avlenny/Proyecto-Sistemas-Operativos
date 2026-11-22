@@ -11,7 +11,7 @@ static int aleatorio(int minimo, int maximo) {
     return rand() % (maximo - minimo + 1) + minimo;
 }
 
-Bloque generarProceso(const Config& cfg, int id, int ciclo) {
+Bloque genProceso(const Config& cfg, int id, int ciclo) {
     Bloque p;
     p.id = id;
     p.tam = aleatorio(1, cfg.maxTam);       
