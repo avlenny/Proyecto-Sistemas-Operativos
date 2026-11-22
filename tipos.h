@@ -14,7 +14,7 @@ struct Config {
     int memoriaKB = 4096;                    
     int quantum = 2;                       
     int maxTam = 500;                     
-    int maxQuantum = 10;                      
+    int maxCuanto = 10;                      
     int velMs = 1000;                    
 };
 
