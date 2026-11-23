@@ -2,23 +2,19 @@
 #define MEMORIA_H
 
 #include <vector>
-#include "tipos.h"     
+#include "tipos.h"
 
-enum class Estrategia { PRIMER_AJUSTE, PEOR_AJUSTE };
+const int LIBRE = -1;
 
-class Memoria {
-public:
-    Memoria(int total, Estrategia e);
-    bool asignar(int pid, int tamano);   
-    bool liberar(int pid);              
-    void condensar();
-    const std::vector<Bloque>& getBloques() const { return bloques; }  
-
-private:
-    int total;
-    Estrategia estrategia;
-    std::vector<Bloque> bloques;        
-    int buscarHueco(int tamano) const;
+struct Segmento {
+    int id;
+    int inicio;
+    int tam;
 };
+
+void memIniciar(const Config& cfg);
+bool memAsignar(const Bloque& p);
+void descargarProceso(int id);
+const std::vector<Segmento>& memLista();
 
 #endif
