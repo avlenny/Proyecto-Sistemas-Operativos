@@ -2,7 +2,7 @@
 #include <cstdlib> 
 #include <ctime>     
 
-static int random(int minimo, int maximo) {
+static int aleatorio(int minimo, int maximo) {
     static bool norep = false;
     if (!norep) {
         srand((unsigned)time(NULL));
@@ -14,8 +14,8 @@ static int random(int minimo, int maximo) {
 Bloque genProceso(const Config& cfg, int id, int ciclo) {
     Bloque p;
     p.id = id;
-    p.tam = random(1, cfg.maxTam);       
-    p.cuanto = random(1, cfg.maxCuanto);   
+    p.tam = aleatorio(1, cfg.maxTam);       
+    p.cuanto = aleatorio(1, cfg.maxCuanto);   
     p.cicloEntrada = ciclo;
     return p;
 }
