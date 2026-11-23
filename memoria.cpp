@@ -5,7 +5,7 @@ Memoria::Memoria(int t, Estrategia e) : total(t), estrategia(e) {
     bloques.push_back({0, t, -1});
 }
 
-// Primer ajuste: primer hueco que alcance. Peor ajuste: el hueco más grande.
+
 int Memoria::buscarHueco(int tamano) const {
     int elegido = -1;
     for (int i = 0; i < (int)bloques.size(); i++) {
@@ -18,7 +18,7 @@ int Memoria::buscarHueco(int tamano) const {
 
 bool Memoria::asignar(int pid, int tamano) {
     int i = buscarHueco(tamano);
-    if (i == -1) {                       // ¿alcanza si se condensa?
+    if (i == -1) {                       
         int libre = 0;
         for (auto& b : bloques) if (b.pid == -1) libre += b.tamano;
         if (libre < tamano) return false;
@@ -37,7 +37,7 @@ bool Memoria::liberar(int pid) {
     for (int i = 0; i < (int)bloques.size(); i++) {
         if (bloques[i].pid != pid) continue;
         bloques[i].pid = -1;
-        // fusionar con el hueco siguiente y con el anterior
+        
         if (i + 1 < (int)bloques.size() && bloques[i + 1].pid == -1) {
             bloques[i].tamano += bloques[i + 1].tamano;
             bloques.erase(bloques.begin() + i + 1);
@@ -51,7 +51,7 @@ bool Memoria::liberar(int pid) {
     return false;
 }
 
-// Junta los procesos al inicio y deja un solo hueco al final
+
 void Memoria::condensar() {
     vector<Bloque> nuevos;
     int dir = 0;
