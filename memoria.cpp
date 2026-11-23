@@ -1,54 +1,79 @@
-#include "memoria.h"
+#include "tipos.h"
+#include <vector>
+#include <deque>
+#include <iostream>
 
-static std::vector<Segmento> mem;
-static int algoritmo = PRIMER_AJUSTE;
+// De planificador.cpp: el cuanto restante de cada proceso vive en la cola RR
+const std::deque<Bloque>& rrLista();
 
-void memIniciar(const Config& cfg) {
-    algoritmo = cfg.algoritmo;
-    mem.clear();
-    mem.push_back({LIBRE, 0, cfg.memoriaKB});
+// Memoria ordenada por direccion fisica. Hueco = bloque con id 0.
+static std::vector<Bloque> memoria;
+
+void iniciarMemoria(int memoriaKB) {
+    memoria.clear();
+    memoria.push_back(Bloque{0, memoriaKB, 0, 0});   // un solo hueco grande
 }
 
-static int buscarHueco(int tam) {
+// Devuelve la posicion del hueco elegido, o -1 si ninguno cabe.
+// alg: 1 = primer ajuste, 2 = peor ajuste
+static int elegirHueco(int tam, int alg) {
     int elegido = -1;
-    for (int i = 0; i < (int)mem.size(); i++) {
-        if (mem[i].id != LIBRE || mem[i].tam < tam) continue;
-        if (algoritmo == PRIMER_AJUSTE) return i;
-        if (elegido == -1 || mem[i].tam > mem[elegido].tam) elegido = i;
+    for (int i = 0; i < (int)memoria.size(); i++) {
+        if (memoria[i].id != 0 || memoria[i].tam < tam) continue;  // ocupado o muy chico
+
+        if (alg == 1) return i;                       // PRIMER AJUSTE: el primero que cabe
+
+        // PEOR AJUSTE: quedarse con el hueco mas grande
+        if (elegido == -1 || memoria[i].tam > memoria[elegido].tam)
+            elegido = i;
     }
     return elegido;
 }
 
-bool memAsignar(const Bloque& p) {
-    int i = buscarHueco(p.tam);
-    if (i == -1) return false;
-    Segmento hueco = mem[i];
-    if (hueco.tam - p.tam >= SPLIT_MINIMO_KB) {
-        mem[i] = {p.id, hueco.inicio, p.tam};
-        mem.insert(mem.begin() + i + 1,
-                   {LIBRE, hueco.inicio + p.tam, hueco.tam - p.tam});
-    } else {
-        mem[i].id = p.id;
-    }
+bool colocarProceso(const Bloque& p, int alg) {
+    int i = elegirHueco(p.tam, alg);
+    if (i == -1) return false;                        // no cabe
+
+    int tamHueco = memoria[i].tam;
+    int sobra = tamHueco - p.tam;
+
+    memoria[i] = p;                                   // el proceso ocupa el inicio del hueco
+    if (sobra >= SPLIT_MINIMO_KB)
+        memoria.insert(memoria.begin() + i + 1, Bloque{0, sobra, 0, 0});  // hueco sobrante
+    else
+        memoria[i].tam = tamHueco;                    // sobra muy poco: se queda todo el hueco
     return true;
 }
 
-void descargarProceso(int id) {
-    for (int i = 0; i < (int)mem.size(); i++) {
-        if (mem[i].id != id) continue;
-        mem[i].id = LIBRE;
-        if (i + 1 < (int)mem.size() && mem[i + 1].id == LIBRE) {
-            mem[i].tam += mem[i + 1].tam;
-            mem.erase(mem.begin() + i + 1);
+// Fusiona huecos contiguos para evitar fragmentacion externa
+static void condensar() {
+    for (int i = 0; i + 1 < (int)memoria.size(); ) {
+        if (memoria[i].id == 0 && memoria[i + 1].id == 0) {
+            memoria[i].tam += memoria[i + 1].tam;
+            memoria.erase(memoria.begin() + i + 1);   // no avanzo i: puede haber otro hueco
+        } else {
+            i++;
         }
-        if (i > 0 && mem[i - 1].id == LIBRE) {
-            mem[i - 1].tam += mem[i].tam;
-            mem.erase(mem.begin() + i);
-        }
-        return;
     }
 }
 
-const std::vector<Segmento>& memLista() {
-    return mem;
+void descargarProceso(int id) {
+    for (auto& b : memoria) {
+        if (b.id == id) { b.id = 0; b.cuanto = 0; break; }
+    }
+    std::cout << "Condensando huecos\n";
+    condensar();
+}
+
+// Imprime [id,tam,cuanto]. El cuanto restante se toma de la cola RR,
+// porque ahi es donde se va restando.
+void imprimirMemoria() {
+    for (const auto& b : memoria) {
+        int cuanto = 0;
+        if (b.id != 0)
+            for (const auto& p : rrLista())
+                if (p.id == b.id) { cuanto = p.cuanto; break; }
+        std::cout << "[" << b.id << "," << b.tam << "," << cuanto << "]";
+    }
+    std::cout << "\n";
 }
