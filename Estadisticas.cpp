@@ -20,7 +20,7 @@ void registrarTerminado(Estadisticas& e, int id, int cicloFin) {
     if (it == e.info.end()) return;
     int llegada = it->second.first;
     int turnos  = it->second.second;
-    int retorno = cicloFin - llegada;
+    int retorno = cicloFin - llegada + 1;
     int espera  = retorno - turnos;
     e.terminados++;
     e.sumaRetorno += retorno;
@@ -64,6 +64,7 @@ void mostrarEstadisticas(const Estadisticas& e) {
     cout << "Procesos terminados ........ " << e.terminados << "\n";
     cout << "Procesos sin terminar ...... " << e.creados - e.terminados << "\n";
     cout << "Ciclos sin espacio ......... " << e.sinEspacio << "\n";
+    // Los promedios son: (suma de todos) / (cuantos fueron)
     cout << "Retorno promedio ........... "
          << promedio((double)e.sumaRetorno, e.terminados) << " ciclos\n";
     cout << "Espera promedio ............ "
