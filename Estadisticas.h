@@ -16,15 +16,13 @@ struct Estadisticas {
     double sumaUso   = 0;
     double sumaFrag  = 0;
     int  huecosMax   = 0;
-
     std::map<int, std::pair<int, int>> info;
 };
 
 void registrarCreado(Estadisticas& e, const Bloque& p, int quantum);
 void registrarSinEspacio(Estadisticas& e);
 void registrarTerminado(Estadisticas& e, int id, int cicloFin);
-void registrarTick(Estadisticas& e, const std::vector<Bloque>& memoria,
-                   int memoriaKB);
+void registrarTick(Estadisticas& e, const std::vector<Bloque>& memoria, int memoriaKB);
 
 void mostrarEstadisticas(const Estadisticas& e);
 
