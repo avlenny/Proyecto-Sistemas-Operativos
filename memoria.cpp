@@ -3,8 +3,7 @@
 #include <deque>
 #include <iostream>
 
-// De planificador.cpp: el cuanto restante de cada proceso vive en la cola RR
-const std::deque<Bloque>& rrLista();
+// (rrLista() y las demas funciones compartidas estan declaradas en tipos.h)
 
 // Memoria ordenada por direccion fisica. Hueco = bloque con id 0.
 static std::vector<Bloque> memoria;
@@ -61,8 +60,17 @@ void descargarProceso(int id) {
     for (auto& b : memoria) {
         if (b.id == id) { b.id = 0; b.cuanto = 0; break; }
     }
-    std::cout << "Condensando huecos\n";
+    imprimirMemoria();       // memoria con el hueco recien liberado (como en el PDF)
+    mostrarCondensando();
     condensar();
+}
+
+// KB ocupados por procesos (los huecos tienen id 0)
+int memoriaOcupadaKB() {
+    int total = 0;
+    for (const auto& b : memoria)
+        if (b.id != 0) total += b.tam;
+    return total;
 }
 
 // Imprime [id,tam,cuanto]. El cuanto restante se toma de la cola RR,
