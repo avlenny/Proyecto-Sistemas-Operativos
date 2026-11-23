@@ -1,62 +1,54 @@
 #include "memoria.h"
-using namespace std;
 
-Memoria::Memoria(int t, Estrategia e) : total(t), estrategia(e) {
-    bloques.push_back({0, t, -1});
+static std::vector<Segmento> mem;
+static int algoritmo = PRIMER_AJUSTE;
+
+void memIniciar(const Config& cfg) {
+    algoritmo = cfg.algoritmo;
+    mem.clear();
+    mem.push_back({LIBRE, 0, cfg.memoriaKB});
 }
 
-
-int Memoria::buscarHueco(int tamano) const {
+static int buscarHueco(int tam) {
     int elegido = -1;
-    for (int i = 0; i < (int)bloques.size(); i++) {
-        if (bloques[i].pid != -1 || bloques[i].tamano < tamano) continue;
-        if (estrategia == Estrategia::PRIMER_AJUSTE) return i;
-        if (elegido == -1 || bloques[i].tamano > bloques[elegido].tamano) elegido = i;
+    for (int i = 0; i < (int)mem.size(); i++) {
+        if (mem[i].id != LIBRE || mem[i].tam < tam) continue;
+        if (algoritmo == PRIMER_AJUSTE) return i;
+        if (elegido == -1 || mem[i].tam > mem[elegido].tam) elegido = i;
     }
     return elegido;
 }
 
-bool Memoria::asignar(int pid, int tamano) {
-    int i = buscarHueco(tamano);
-    if (i == -1) {                       
-        int libre = 0;
-        for (auto& b : bloques) if (b.pid == -1) libre += b.tamano;
-        if (libre < tamano) return false;
-        condensar();
-        i = buscarHueco(tamano);
+bool memAsignar(const Bloque& p) {
+    int i = buscarHueco(p.tam);
+    if (i == -1) return false;
+    Segmento hueco = mem[i];
+    if (hueco.tam - p.tam >= SPLIT_MINIMO_KB) {
+        mem[i] = {p.id, hueco.inicio, p.tam};
+        mem.insert(mem.begin() + i + 1,
+                   {LIBRE, hueco.inicio + p.tam, hueco.tam - p.tam});
+    } else {
+        mem[i].id = p.id;
     }
-    Bloque hueco = bloques[i];
-    bloques[i] = {hueco.inicio, tamano, pid};
-    if (hueco.tamano > tamano)
-        bloques.insert(bloques.begin() + i + 1,
-                       {hueco.inicio + tamano, hueco.tamano - tamano, -1});
     return true;
 }
 
-bool Memoria::liberar(int pid) {
-    for (int i = 0; i < (int)bloques.size(); i++) {
-        if (bloques[i].pid != pid) continue;
-        bloques[i].pid = -1;
-        
-        if (i + 1 < (int)bloques.size() && bloques[i + 1].pid == -1) {
-            bloques[i].tamano += bloques[i + 1].tamano;
-            bloques.erase(bloques.begin() + i + 1);
+void descargarProceso(int id) {
+    for (int i = 0; i < (int)mem.size(); i++) {
+        if (mem[i].id != id) continue;
+        mem[i].id = LIBRE;
+        if (i + 1 < (int)mem.size() && mem[i + 1].id == LIBRE) {
+            mem[i].tam += mem[i + 1].tam;
+            mem.erase(mem.begin() + i + 1);
         }
-        if (i > 0 && bloques[i - 1].pid == -1) {
-            bloques[i - 1].tamano += bloques[i].tamano;
-            bloques.erase(bloques.begin() + i);
+        if (i > 0 && mem[i - 1].id == LIBRE) {
+            mem[i - 1].tam += mem[i].tam;
+            mem.erase(mem.begin() + i);
         }
-        return true;
+        return;
     }
-    return false;
 }
 
-
-void Memoria::condensar() {
-    vector<Bloque> nuevos;
-    int dir = 0;
-    for (auto& b : bloques)
-        if (b.pid != -1) { nuevos.push_back({dir, b.tamano, b.pid}); dir += b.tamano; }
-    if (dir < total) nuevos.push_back({dir, total - dir, -1});
-    bloques = nuevos;
+const std::vector<Segmento>& memLista() {
+    return mem;
 }
