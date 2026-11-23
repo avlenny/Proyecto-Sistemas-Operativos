@@ -63,7 +63,6 @@ int main() {
 
         // 3. Estado final del ciclo
         mostrarMemoria();
-        mostrarVelocidad(cfg.velMs);
         sumaOcupacion += memoriaOcupadaKB() * 100.0 / cfg.memoriaKB;
 
         detener = esperar(cfg.velMs);

@@ -52,7 +52,6 @@ void mostrarDescarga(const Bloque& p);
 void mostrarCondensando();
 void mostrarListaRR();
 void mostrarMemoria();
-void mostrarVelocidad(int velMs);
 void mostrarEstadisticas(int ciclos, int terminados, long long sumaAtencion,
                          double ocupacionPromedio);
 
