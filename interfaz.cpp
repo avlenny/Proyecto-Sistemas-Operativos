@@ -50,9 +50,9 @@ void mostrarMemoria() {
     imprimirMemoria();   // la memoria es privada de memoria.cpp
 }
 
-void mostrarVelocidad(int velMs) {
+/*void mostrarVelocidad(int velMs) {
     cout << "(velocidad: " << velMs << " ms por ciclo)\n";
-}
+}*/
 
 void mostrarEstadisticas(int ciclos, int terminados, long long sumaAtencion,
                          double ocupacionPromedio) {

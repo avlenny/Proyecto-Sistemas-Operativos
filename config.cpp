@@ -29,7 +29,7 @@ Config pedirConfig() {
     cfg.quantum = leerInt("Cuanto del sistema", 1, 20, 2);
     cfg.maxTam = leerInt("Tamano maximo de proceso (KB)", 1, cfg.memoriaKB, 500);
     cfg.maxCuanto = leerInt("Cuanto maximo por proceso", 1, 100, 10);
-    cfg.velMs = leerInt("Espera entre ciclos (ms)", 50, 5000, 1000);
+    //cfg.velMs = leerInt("Espera entre ciclos (ms)", 50, 5000, 1000);
     
     return cfg;
 }
@@ -40,6 +40,6 @@ void mostrarConfig(const Config& cfg) {
          << "Memoria: " << cfg.memoriaKB << " KB\n"
          << "Cuanto sistema: " << cfg.quantum << "\n"
          << "Tam. max proceso: " << cfg.maxTam << " KB\n"
-         << "Cuanto max: " << cfg.maxCuanto << "\n"
-         << "Espera por ciclo: " << cfg.velMs << " ms\n";
+         << "Cuanto max: " << cfg.maxCuanto << "\n";
+        //<< "Espera por ciclo: " << cfg.velMs << " ms\n";
 }

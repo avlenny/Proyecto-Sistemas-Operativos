@@ -19,7 +19,7 @@ struct Config {
     int quantum = 2;
     int maxTam = 500;
     int maxCuanto = 10;
-    int velMs = 1000;
+    int velMs = 5000;
     int algoritmo = PRIMER_AJUSTE;
 };
 
