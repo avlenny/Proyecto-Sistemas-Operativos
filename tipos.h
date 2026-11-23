@@ -1,6 +1,6 @@
 #ifndef TIPOS_H
 #define TIPOS_H
-
+#include <deque>
 //Aquí pongan las funciones que todos vamos a usar, por ejemplo la función de los algoritmos de colocación
 const int PRIMER_AJUSTE = 1;
 const int PEOR_AJUSTE = 2;

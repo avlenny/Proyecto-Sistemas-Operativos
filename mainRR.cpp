@@ -1,10 +1,10 @@
 #include "tipos.h"
 #include <iostream>
 #include <string>
-#include <thread>
-#include <chrono>
-#include <atomic>
 #include <deque>
+#include <conio.h>      // _kbhit y _getch (teclado sin bloquear)
+#define NOMINMAX        // evita que windows.h rompa std::min
+#include <windows.h>    // Sleep
 using namespace std;
 
 // ---- planificador.cpp ----
@@ -14,11 +14,10 @@ void rrLimpiar();
 bool rrAtender(int quantum, int ciclo, int& tiempoAtencion);
 
 // ---- memoria.cpp (Primer y Peor ajuste) ----
-// alg: 1 = primer ajuste, 2 = peor ajuste. colocarProceso devuelve false si no cabe.
 void iniciarMemoria(int memoriaKB);
 bool colocarProceso(const Bloque& p, int alg);
-void descargarProceso(int id);   // libera el bloque y condensa huecos
-void imprimirMemoria();          // imprime [id,tam,cuanto][...]
+void descargarProceso(int id);
+void imprimirMemoria();
 
 static void imprimirListaRR() {
     cout << "Lista RR";
@@ -27,33 +26,45 @@ static void imprimirListaRR() {
     cout << "\n";
 }
 
+// Espera velMs milisegundos revisando el teclado cada 20 ms.
+// Enter = detener (devuelve true). '+' = mas rapido, '-' = mas lento.
+static bool esperar(int& velMs) {
+    int espera = 0;
+    while (espera < velMs) {
+        while (_kbhit()) {
+            int c = _getch();
+            if (c == '\r' || c == '\n') return true;
+            if (c == '+') velMs = (velMs - 100 < 50) ? 50 : velMs - 100;
+            if (c == '-') velMs = (velMs + 100 > 5000) ? 5000 : velMs + 100;
+        }
+        Sleep(20);
+        espera += 20;
+    }
+    return false;
+}
+
 int main() {
-    Config cfg = pedirConfig();      // aqui el usuario elige tambien el algoritmo
+    Config cfg = pedirConfig();
     mostrarConfig(cfg);
-    int alg = cfg.algoritmo;         // 1 = primer ajuste, 2 = peor ajuste
+    int alg = cfg.algoritmo;
 
     iniciarMemoria(cfg.memoriaKB);
     rrLimpiar();
 
-    // Condicion de paro: el usuario presiona Enter
-    atomic<bool> detener(false);
-    cout << "\nPresiona ENTER para detener la simulacion.\n\n";
-    thread hilo([&detener]() {
-        string s;
-        getline(cin, s);
-        detener = true;
-    });
-    hilo.detach();
+    cout << "\nENTER = detener | '+' = mas rapido | '-' = mas lento\n\n";
+
     int ciclo = 0, siguienteId = 1, terminados = 0;
     long long sumaAtencion = 0;
-    Bloque pendiente = genProceso(cfg, siguienteId++, ciclo);   // siempre hay uno listo
+    bool detener = false;
+    Bloque pendiente = genProceso(cfg, siguienteId++, ciclo);
+
     while (!detener) {
         ciclo++;
         cout << "\n===== CICLO " << ciclo << " =====\n";
 
         // 1. Entrada a memoria
         if (colocarProceso(pendiente, alg)) {
-            pendiente.cicloEntrada = ciclo;   // ciclo en que entro a memoria
+            pendiente.cicloEntrada = ciclo;
             rrAgregar(pendiente);
             cout << "Entra Proceso [" << pendiente.id << "," << pendiente.tam
                  << "," << pendiente.cuanto << "]\n";
@@ -69,17 +80,21 @@ int main() {
             terminados++;
             sumaAtencion += tiempoAtencion;
         }
+
         // 3. Estado del ciclo
         imprimirListaRR();
         imprimirMemoria();
-        this_thread::sleep_for(chrono::milliseconds(cfg.velMs));
+        cout << "(velocidad: " << cfg.velMs << " ms por ciclo)\n";
+
+        detener = esperar(cfg.velMs);
     }
 
     cout << "\n--- Estadisticas ---\n"
          << "Ciclos ejecutados: " << ciclo << "\n"
          << "Procesos atendidos: " << terminados << "\n";
     if (terminados > 0)
-        cout << "Tiempo medio de atencion: " << (double)sumaAtencion / terminados << " ciclos\n";
+        cout << "Tiempo medio de atencion: "
+             << (double)sumaAtencion / terminados << " ciclos\n";
 
     return 0;
 }
