@@ -37,7 +37,6 @@ static vector<Bloque> leerMemoria() {
 
     vector<Bloque> lista;
     size_t pos = 0;
-
     while ((pos = t.find('[', pos)) != string::npos) {
         int id = 0, tam = 0, cuanto = 0;
         char c1 = 0, c2 = 0, c3 = 0, c4 = 0;
@@ -73,7 +72,6 @@ int main() {
     int ciclo = 0, siguienteId = 1;
 
     Bloque pendiente = genProceso(cfg, siguienteId++, ciclo);
-    registrarCreado(est, pendiente, cfg.quantum);
 
     iniciarInterfaz();
 
@@ -82,14 +80,14 @@ int main() {
         vector<string> eventos;
 
         if (colocarProceso(pendiente, cfg.algoritmo)) {
-
+            pendiente.cicloEntrada = ciclo;
+            registrarCreado(est, pendiente, cfg.quantum);
             rrAgregar(pendiente);
             eventos.push_back("Entra P" + to_string(pendiente.id) + " (" +
                               to_string(pendiente.tam) + " KB, cuanto " +
                               to_string(pendiente.cuanto) + ")");
-
+            // ...y generamos el siguiente (asi siempre hay uno listo).
             pendiente = genProceso(cfg, siguienteId++, ciclo);
-            registrarCreado(est, pendiente, cfg.quantum);
         } else {
             registrarSinEspacio(est);
             eventos.push_back("P" + to_string(pendiente.id) + " (" +
