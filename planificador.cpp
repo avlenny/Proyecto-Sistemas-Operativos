@@ -2,13 +2,13 @@
 #include <deque>
 #include <algorithm>
 
-static std::deque<Bloque> colaRR; // Cola RR (FIFO): cuanto restante de cada proceso.
+static std::deque<Bloque> colaRR; 
 
-void rrAgregar(const Bloque& p) { // Proceso entra a cola RR.
+void rrAgregar(const Bloque& p) { 
     colaRR.push_back(p);
 }
 
-const std::deque<Bloque>& rrLista() { // Devuelve la cola por referencia.
+const std::deque<Bloque>& rrLista() { 
     return colaRR;
 }
 
@@ -16,26 +16,25 @@ void rrLimpiar() {
     colaRR.clear();
 }
 
-// Ejecuta un turno de Round Robin.
-// Devuelve true si el proceso termino. tiempoAtencion = ciclos desde su entrada.
+// ejecuta un turno de Round Robin.
 bool rrAtender(int quantum, int ciclo, int& tiempoAtencion) {
     if (colaRR.empty()) return false;
 
-    Bloque p = colaRR.front(); // El que mas tiempo lleva esperando.
+    Bloque p = colaRR.front(); 
     colaRR.pop_front();
 
     mostrarAtencion(p);
-    p.cuanto -= std::min(quantum, p.cuanto); // min() para no pasar a negativo.
+    p.cuanto -= std::min(quantum, p.cuanto); 
 
-    if (p.cuanto == 0) {                     // Termino: no regresa a la cola.
+    if (p.cuanto == 0) {                    
         tiempoAtencion = ciclo - p.cicloEntrada;
-        mostrarListaRR();                    // la lista ya sin el proceso (como en el PDF)
+        mostrarListaRR();                   
         mostrarDescarga(p);
-        descargarProceso(p.id);              // libera el bloque y condensa huecos
+        descargarProceso(p.id);              
         return true;
     }
 
-    colaRR.push_back(p);                     // Le queda tiempo: al final de la cola.
+    colaRR.push_back(p);                     
     mostrarListaRR();
     return false;
 }

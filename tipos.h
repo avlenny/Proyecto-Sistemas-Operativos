@@ -25,25 +25,20 @@ struct Config {
 
 const int SPLIT_MINIMO_KB = 32;
 
-// ---- config.cpp / generadorPro.cpp ----
 Config pedirConfig();
-void mostrarConfig(const Config& cfg);
 Bloque genProceso(const Config& cfg, int id, int ciclo);
 
-// ---- planificador.cpp (Round Robin) ----
 void rrAgregar(const Bloque& p);
 const std::deque<Bloque>& rrLista();
 void rrLimpiar();
 bool rrAtender(int quantum, int ciclo, int& tiempoAtencion);
 
-// ---- memoria.cpp (Primer y Peor ajuste) ----
 void iniciarMemoria(int memoriaKB);
 bool colocarProceso(const Bloque& p, int alg);   // false si no cabe
 void descargarProceso(int id);                   // libera y condensa huecos
 void imprimirMemoria();                          // imprime [id,tam,cuanto][...]
 int  memoriaOcupadaKB();                         // KB ocupados por procesos
 
-// ---- interfaz.cpp (TODA la salida a pantalla) ----
 void mostrarCiclo(int ciclo);
 void mostrarEntrada(const Bloque& p);
 void mostrarEspera(const Bloque& p);

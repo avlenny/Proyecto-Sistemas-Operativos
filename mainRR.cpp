@@ -1,12 +1,10 @@
 #include "tipos.h"
 #include <iostream>
-#include <conio.h>      // _kbhit y _getch (teclado sin bloquear)
-#define NOMINMAX        // evita que windows.h rompa std::min
+#include <conio.h>      
+#define NOMINMAX        
 #include <windows.h>    // Sleep
 using namespace std;
 
-// Espera velMs milisegundos revisando el teclado cada 20 ms.
-// Enter = detener (devuelve true). '+' = mas rapido, '-' = mas lento.
 static bool esperar(int& velMs) {
     int espera = 0;
     while (espera < velMs) {
@@ -30,8 +28,6 @@ int main() {
     iniciarMemoria(cfg.memoriaKB);
     rrLimpiar();
 
-    cout << "\nENTER = detener | '+' = mas rapido | '-' = mas lento\n";
-
     int ciclo = 0, siguienteId = 1, terminados = 0;
     long long sumaAtencion = 0;
     double sumaOcupacion = 0;        // para el % promedio de ocupacion
@@ -48,7 +44,7 @@ int main() {
             pendiente.cicloEntrada = ciclo;
             rrAgregar(pendiente);
             mostrarEntrada(pendiente);
-            mostrarMemoria();                                   // como en el PDF
+            mostrarMemoria();                              
             pendiente = genProceso(cfg, siguienteId++, ciclo);
         } else {
             mostrarEspera(pendiente);

@@ -3,26 +3,20 @@
 #include <deque>
 #include <iostream>
 
-// (rrLista() y las demas funciones compartidas estan declaradas en tipos.h)
-
-// Memoria ordenada por direccion fisica. Hueco = bloque con id 0.
 static std::vector<Bloque> memoria;
 
 void iniciarMemoria(int memoriaKB) {
     memoria.clear();
-    memoria.push_back(Bloque{0, memoriaKB, 0, 0});   // un solo hueco grande
+    memoria.push_back(Bloque{0, memoriaKB, 0, 0});  
 }
 
-// Devuelve la posicion del hueco elegido, o -1 si ninguno cabe.
-// alg: 1 = primer ajuste, 2 = peor ajuste
 static int elegirHueco(int tam, int alg) {
     int elegido = -1;
     for (int i = 0; i < (int)memoria.size(); i++) {
-        if (memoria[i].id != 0 || memoria[i].tam < tam) continue;  // ocupado o muy chico
+        if (memoria[i].id != 0 || memoria[i].tam < tam) continue;  
 
-        if (alg == 1) return i;                       // PRIMER AJUSTE: el primero que cabe
+        if (alg == 1) return i;                      
 
-        // PEOR AJUSTE: quedarse con el hueco mas grande
         if (elegido == -1 || memoria[i].tam > memoria[elegido].tam)
             elegido = i;
     }
@@ -31,25 +25,25 @@ static int elegirHueco(int tam, int alg) {
 
 bool colocarProceso(const Bloque& p, int alg) {
     int i = elegirHueco(p.tam, alg);
-    if (i == -1) return false;                        // no cabe
+    if (i == -1) return false;                       
 
     int tamHueco = memoria[i].tam;
     int sobra = tamHueco - p.tam;
 
-    memoria[i] = p;                                   // el proceso ocupa el inicio del hueco
+    memoria[i] = p;                                   
     if (sobra >= SPLIT_MINIMO_KB)
-        memoria.insert(memoria.begin() + i + 1, Bloque{0, sobra, 0, 0});  // hueco sobrante
+        memoria.insert(memoria.begin() + i + 1, Bloque{0, sobra, 0, 0});  
     else
-        memoria[i].tam = tamHueco;                    // sobra muy poco: se queda todo el hueco
+        memoria[i].tam = tamHueco;                    
     return true;
 }
 
-// Fusiona huecos contiguos para evitar fragmentacion externa
+//fusiona huecos contiguos para evitar fragmentacion externa
 static void condensar() {
     for (int i = 0; i + 1 < (int)memoria.size(); ) {
         if (memoria[i].id == 0 && memoria[i + 1].id == 0) {
             memoria[i].tam += memoria[i + 1].tam;
-            memoria.erase(memoria.begin() + i + 1);   // no avanzo i: puede haber otro hueco
+            memoria.erase(memoria.begin() + i + 1);   
         } else {
             i++;
         }
@@ -60,12 +54,11 @@ void descargarProceso(int id) {
     for (auto& b : memoria) {
         if (b.id == id) { b.id = 0; b.cuanto = 0; break; }
     }
-    imprimirMemoria();       // memoria con el hueco recien liberado (como en el PDF)
+    imprimirMemoria();       
     mostrarCondensando();
     condensar();
 }
 
-// KB ocupados por procesos (los huecos tienen id 0)
 int memoriaOcupadaKB() {
     int total = 0;
     for (const auto& b : memoria)
@@ -73,8 +66,6 @@ int memoriaOcupadaKB() {
     return total;
 }
 
-// Imprime [id,tam,cuanto]. El cuanto restante se toma de la cola RR,
-// porque ahi es donde se va restando.
 void imprimirMemoria() {
     for (const auto& b : memoria) {
         int cuanto = 0;
