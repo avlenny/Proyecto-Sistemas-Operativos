@@ -5,8 +5,6 @@ using namespace std;
 
 static int leerInt(const string& texto, int min, int max, int defecto) {
     while (true) {
-        cout << texto << " [" << min << "-" << max
-             << "] (Enter = " << defecto << "): ";
         string s;
         if (!getline(cin, s)) return defecto;   
         if (s.empty()) return defecto;        
