@@ -2,7 +2,7 @@
 #include <iostream>
 #include <conio.h>      
 #define NOMINMAX        
-#include <windows.h>    // Sleep
+#include <windows.h>    //sleep
 using namespace std;
 
 static bool esperar(int& velMs) {
@@ -21,25 +21,22 @@ static bool esperar(int& velMs) {
 }
 
 int main() {
-    Config cfg = pedirConfig();      // aqui el usuario elige tambien el algoritmo
-    mostrarConfig(cfg);
-    int alg = cfg.algoritmo;         // 1 = primer ajuste, 2 = peor ajuste
+    Config cfg = pedirConfig();      
+    int alg = cfg.algoritmo;        
 
     iniciarMemoria(cfg.memoriaKB);
     rrLimpiar();
 
     int ciclo = 0, siguienteId = 1, terminados = 0;
     long long sumaAtencion = 0;
-    double sumaOcupacion = 0;        // para el % promedio de ocupacion
+    double sumaOcupacion = 0;        
     bool detener = false;
 
-    Bloque pendiente = genProceso(cfg, siguienteId++, ciclo);   // siempre hay uno listo
+    Bloque pendiente = genProceso(cfg, siguienteId++, ciclo);   
 
     while (!detener) {
         ciclo++;
         mostrarCiclo(ciclo);
-
-        // 1. Entrada a memoria
         if (colocarProceso(pendiente, alg)) {
             pendiente.cicloEntrada = ciclo;
             rrAgregar(pendiente);
@@ -49,15 +46,11 @@ int main() {
         } else {
             mostrarEspera(pendiente);
         }
-
-        // 2. Turno de Round Robin (imprime atencion, lista RR y descarga)
         int tiempoAtencion = 0;
         if (rrAtender(cfg.quantum, ciclo, tiempoAtencion)) {
             terminados++;
             sumaAtencion += tiempoAtencion;
         }
-
-        // 3. Estado final del ciclo
         mostrarMemoria();
         sumaOcupacion += memoriaOcupadaKB() * 100.0 / cfg.memoriaKB;
 
