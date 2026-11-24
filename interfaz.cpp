@@ -6,18 +6,15 @@ static void imprimirProceso(const Bloque& p) {
     cout << "[" << p.id << "," << p.tam << "," << p.cuanto << "]";
 }
 
-void mostrarCiclo(int ciclo) {
-    cout << "\n===== CICLO " << ciclo << " =====\n";
-}
 
 void mostrarEntrada(const Bloque& p) {
-    cout << "Entra Proceso ";
+    cout << "\nEntra Proceso ";
     imprimirProceso(p);
     cout << "\n";
 }
 
 void mostrarEspera(const Bloque& p) {
-    cout << "Proceso ";
+    cout << "\nProceso ";
     imprimirProceso(p);
     cout << " espera: no cabe\n";
 }

@@ -28,6 +28,7 @@ Config pedirConfig() {
     cfg.quantum = leerInt("Cuanto del sistema", 1, 20, 2);
     cfg.maxTam = leerInt("Tamano maximo de proceso (KB)", 1, cfg.memoriaKB, 500);
     cfg.maxCuanto = leerInt("Cuanto maximo por proceso", 1, 100, 10);
+    system("cls");
     return cfg;
 }
 

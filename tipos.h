@@ -39,7 +39,6 @@ void descargarProceso(int id);                   // libera y condensa huecos
 void imprimirMemoria();                          // imprime [id,tam,cuanto][...]
 int  memoriaOcupadaKB();                         // KB ocupados por procesos
 
-void mostrarCiclo(int ciclo);
 void mostrarEntrada(const Bloque& p);
 void mostrarEspera(const Bloque& p);
 void mostrarAtencion(const Bloque& p);

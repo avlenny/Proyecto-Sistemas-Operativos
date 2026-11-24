@@ -36,7 +36,6 @@ int main() {
 
     while (!detener) {
         ciclo++;
-        mostrarCiclo(ciclo);
         if (colocarProceso(pendiente, alg)) {
             pendiente.cicloEntrada = ciclo;
             rrAgregar(pendiente);
