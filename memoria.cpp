@@ -31,10 +31,10 @@ bool colocarProceso(const Bloque& p, int alg) { //Mete el proceso a la memoria s
     int sobra = tamHueco - p.tam; //Espacio libre después de colocar el proceso
 
     memoria[i] = p; //El proceso ocupa el inicio del hueco (bloque tam=tam proceso)                                  
-    if (sobra >= SPLIT_MINIMO_KB) //Acción sobre lo que sobra
+    //if (sobra >= SPLIT_MINIMO_KB) //Acción sobre lo que sobra
         memoria.insert(memoria.begin() + i + 1, Bloque{0, sobra, 0, 0});  //32+ kb inserta hueco desoues del proceso
-    else
-        memoria[i].tam = tamHueco;   //32-kb el proceso ocupa todo el hueco                 
+    //else
+        //memoria[i].tam = tamHueco;   //32-kb el proceso ocupa todo el hueco                 
     return true; //Proceso colocado
 }
 
